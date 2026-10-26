@@ -220,13 +220,15 @@ window.__ModuleLoader__.load({
           ? h('div', { style: { ...S.error, borderColor: 'var(--dsw-alias-state-warn-primary)', color: 'var(--dsw-alias-state-warn-primary)' } }, t0('executableMissing'))
           : null);
 
-      return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 760 } },
+      return h(React.Fragment, null,
+        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 760 } },
         header,
         error ? h('div', { role: 'alert', style: S.error }, error) : null,
         notice ? h('div', { role: 'status', style: { fontSize: 13, color: 'var(--dsw-alias-state-success-primary)' } }, notice) : null,
         connectionSection,
         sitesSection,
-        h('p', { style: { margin: 0, fontSize: 12.5, lineHeight: 1.6, color: 'var(--dsw-alias-label-secondary)' } }, t0('approvalNote')));
+        h('p', { style: { margin: 0, fontSize: 12.5, lineHeight: 1.6, color: 'var(--dsw-alias-label-secondary)' } }, t0('approvalNote'))),
+        h(Panel, { ctx }));
     }
 
     function Panel({ ctx }) {
@@ -315,7 +317,7 @@ window.__ModuleLoader__.load({
           : h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4 } },
             history.map((entry) => h('div', { key: entry.id, style: { ...S.label, ...S.mono } }, `${entry.at} · ${entry.action} · ${entry.ok ? 'ok' : 'fail'} · ${entry.detail || ''}`))));
 
-      return h('div', { style: S.page },
+      return h('div', { style: { ...S.page, padding: '0 0 8px' } },
         h('div', { style: S.wrap },
           header,
           error ? h('div', { role: 'alert', style: S.error }, `${t0('error')}${error}`) : null,
@@ -332,16 +334,10 @@ window.__ModuleLoader__.load({
       inject: ['slots', 'connection', 'locale'],
       apply(ctx) {
         ctx.effect(() => {
-          const sidebar = ctx.slots.inject('sidebar.panellist', () => ctx.slots.register(
-            { name: 'sidebar.panellist', id: 'dsh-browser-computer-use', order: 26, label: () => dictOf(ctx).title },
-            () => h('span', { style: { fontSize: 15, lineHeight: 1 }, 'aria-hidden': 'true' }, '◎')));
-          const main = ctx.slots.inject('main', () => ctx.slots.register(
-            { name: 'main', key: 'dsh-browser-computer-use' },
-            () => h(Panel, { ctx })));
-          const settings = ctx.slots.inject('settings.section', () => ctx.slots.register(
+          const section = ctx.slots.inject('settings.section', () => ctx.slots.register(
             { name: 'settings.section', id: 'browser-use', order: 35, label: () => dictOf(ctx).title },
             () => h(SettingsPage, { ctx })));
-          return () => { try { sidebar?.(); } catch {} try { main?.(); } catch {} try { settings?.(); } catch {} };
+          return () => { try { section?.(); } catch {} };
         });
       },
     };

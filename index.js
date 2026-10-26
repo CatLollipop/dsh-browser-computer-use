@@ -7,11 +7,11 @@ export const inject = ['connection', 'tools']
 const MUTATING = new Set(['open', 'navigate', 'click', 'type', 'key', 'scroll', 'activate', 'closeTab'])
 
 const PROMPT = [
-  'The browser tool controls a real Chromium browser over CDP, but only after the user enables it in the left sidebar 「浏览器」panel.',
+  'The browser tool controls a real Chromium browser over CDP, but only after the user enables it in Settings → 浏览器 (no sidebar icon is added).',
   'Read-only actions (status, tabs, read, screenshot) work once enabled.',
   'Mutating actions (open, navigate, click, type, key, scroll, closeTab) always ask the user for one-time approval; a denied approval must not be retried in a loop.',
   'Never type credentials, cookies, or payment data. Password fields are refused by the browser tool.',
-  'If the browser is disabled or unreachable, tell the user to open the Browser panel, check the debug endpoint, and press 启动浏览器 / 重新检测 instead of retrying tools.',
+  'If the browser is disabled or unreachable, tell the user to open Settings → 浏览器, check the debug endpoint, and press 启动浏览器 / 重新检测 instead of retrying tools.',
 ].join(' ')
 
 function safeGet(ctx, name) {
@@ -43,7 +43,7 @@ async function requestApproval(ctx, exec, action, payload) {
 function browserTool(controller, ctx) {
   return {
     name: 'browser',
-    description: '用 CDP 控制用户已授权的 Chromium 浏览器：status/tabs/read/screenshot 只读；open/navigate/click/type/key/scroll/closeTab 会请求用户一次性审批。浏览器需在侧栏「浏览器」面板手动启用。',
+    description: '用 CDP 控制用户已授权的 Chromium 浏览器：status/tabs/read/screenshot 只读；open/navigate/click/type/key/scroll/closeTab 会请求用户一次性审批。浏览器需在设置 → 浏览器中手动启用。',
     timeoutMs: 120000,
     parameters: {
       type: 'object',

@@ -13,7 +13,7 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 安装后：
 
 - 设置里多出 **浏览器** 页：CDP 开关、调试地址、启动浏览器、网站权限；
-- 左侧栏多出 **浏览器** 面板：标签页、导航、读取页面、截图、操作记录；
+- 不再新增左侧栏图标；标签页、导航、读取页面、截图、操作记录都在 **设置 → 浏览器** 页内；
 - 模型获得 `browser` 工具（需先手动开启 CDP）。
 
 ## 手动开启 CDP
@@ -31,7 +31,7 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 
 支持的浏览器：Chrome、Chrome Canary、Chromium、Microsoft Edge、Brave，以及 Playwright 缓存里的 “Google Chrome for Testing”。也可用 `DSH_BROWSER_EXECUTABLE` 指定可执行文件；`DSH_BROWSER_HEADLESS=1` 可让启动器以 headless 模式启动（用于验证或服务器环境）。
 
-4. 点 **重新检测**，状态变为「已连接」后，左侧栏 **浏览器** 面板就可操作。
+4. 点 **重新检测**，状态变为「已连接」后，页面下方的标签页、导航、读取、截图与操作记录即可使用。
 
 ## 网站权限（设置内配置）
 
