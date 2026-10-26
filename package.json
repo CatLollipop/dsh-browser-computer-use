@@ -1,0 +1,10 @@
+{
+  "name": "@local/dsh-browser-computer-use",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "安全浏览器计算任务中心（仅任务编排与只读 Web fallback，不控制真实浏览器）",
+  "exports": { ".": "./index.js", "./client": "./client.js", "./rpc": "./rpc.js", "./locale/*.json": "./locale/*.json", "./icon": "./icon.svg" },
+  "files": ["package.json", "cordis.patch.yml", "index.js", "client.js", "rpc.js", "README.md", "locale/*.json", "icon.svg", "test/*.test.js"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" }, "client": { "platform": "web", "immediately": true, "inject": ["@deepseek-ai/dsh-client-ui-conversation"] } }
+}

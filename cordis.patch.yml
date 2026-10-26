@@ -1,0 +1,6 @@
+- insert:
+    - id: dsh-browser-computer-use
+      name: '@local/dsh-browser-computer-use'
+      config:
+        defaultRisk: L2
+        provider: unavailable

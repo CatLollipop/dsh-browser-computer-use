@@ -1,0 +1,4 @@
+{
+  "meta": { "title": "安全浏览器任务中心", "description": "安全规划与审阅浏览器计算任务；不接外部账户、不控制真实浏览器。" },
+  "ui": { "title": "浏览器任务中心", "newTask": "新建任务", "empty": "暂无任务", "providerUnavailable": "Provider 不可用", "readonly": "只读 fallback", "approval": "审批", "pause": "暂停", "resume": "继续", "cancel": "取消", "save": "保存", "delete": "删除", "risk": "风险级别", "timeline": "动作时间线", "description": "描述", "url": "URL", "search": "搜索", "fetch": "抓取", "noPermission": "需要权限", "error": "发生错误", "status": { "draft": "草稿", "awaiting_approval": "等待审批", "running": "运行中", "paused": "已暂停", "completed": "已完成", "cancelled": "已取消", "error": "错误" } }
+}

@@ -1,0 +1,1 @@
+Locale resources: `en.json` and `zh.json`. Runtime UI uses the Host locale service when available and falls back to English labels.

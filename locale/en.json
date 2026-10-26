@@ -1,0 +1,4 @@
+{
+  "meta": { "title": "Safe Browser Task Center", "description": "Plan and review browser-computer tasks safely; no external accounts or real browser control." },
+  "ui": { "title": "Browser task center", "newTask": "New task", "empty": "No tasks yet", "providerUnavailable": "Provider unavailable", "readonly": "Read-only fallback", "approval": "Approval", "pause": "Pause", "resume": "Resume", "cancel": "Cancel", "save": "Save", "delete": "Delete", "risk": "Risk level", "timeline": "Action timeline", "description": "Description", "url": "URL", "search": "Search", "fetch": "Fetch", "noPermission": "Permission required", "error": "Something went wrong", "status": { "draft": "Draft", "awaiting_approval": "Awaiting approval", "running": "Running", "paused": "Paused", "completed": "Completed", "cancelled": "Cancelled", "error": "Error" } }
+}
