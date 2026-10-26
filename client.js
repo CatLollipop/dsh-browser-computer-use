@@ -255,7 +255,7 @@ window.__ModuleLoader__.load({
             h('button', { type: 'button', className: 'bw-secondary', disabled: Boolean(busy), onClick: () => run('endpoint', () => callHost(ctx, { action: 'configure', endpoint }), t('connected')) }, t('saveEndpoint'))),
           h('div', { className: 'bw-actions' },
             h('button', { type: 'button', className: 'bw-primary', disabled: Boolean(busy), onClick: () => run('launch', () => callHost(ctx, { action: 'launch' }), t('launched')) }, busy === 'launch' ? t('working') : t('launch')),
-            h('button', { type: 'button', className: 'bw-secondary', disabled: Boolean(busy), onClick: () => run('test', () => callHost(ctx, { action: 'test' }), t('connected')) }, busy === 'test' ? t('working') : t('retest')),
+            h('button', { type: 'button', className: 'bw-secondary', disabled: Boolean(busy) || !enabled, onClick: () => run('test', () => callHost(ctx, { action: 'test' }), t('connected')) }, busy === 'test' ? t('working') : t('retest')),
             h('button', { type: 'button', className: 'bw-link', disabled: Boolean(busy), onClick: () => run('clear', () => callHost(ctx, { action: 'clearHistory' }), t('revoked')) }, t('clear'))),
           h('p', { className: 'bw-help' }, t('skillsHint')),
           status.executableFound === false ? h('p', { className: 'bw-note' }, t('noExecutable')) : null,
