@@ -43,5 +43,5 @@ export function apply(ctx, config = {}) {
   try { ctx.provide?.('browserTaskCenter', api) } catch {}
   const disposeTool = ctx.tools?.register?.(toolDefinition(api))
   const disposeRoute = registerRpcRoute(ctx, (payload) => api.dispatch(payload))
-  ctx.effect?.(() => () => { try { disposeTool?.() } catch {} try { disposeRoute?.() } catch {} })
+  ctx.effect(() => () => { try { disposeTool?.() } catch {} try { disposeRoute?.() } catch {} })
 }

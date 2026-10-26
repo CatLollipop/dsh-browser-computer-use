@@ -58,7 +58,7 @@ export function createReadOnlyWeb({ web } = {}) {
   }
 }
 
-export function createRpcClient({ endpoint = '/api/dsh_browser_computer_use', transport } = {}) {
+export function createRpcClient({ endpoint = '/api/dsh-browser-computer-use', transport } = {}) {
   const call = transport || (async (payload) => {
     const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
     if (!response.ok) throw new Error(`RPC ${response.status}`)
@@ -68,16 +68,27 @@ export function createRpcClient({ endpoint = '/api/dsh_browser_computer_use', tr
 }
 
 export function registerRpcRoute(ctx, handler) {
-  const rpc = ctx?.connection?.rpc
-  if (typeof rpc?.handle !== 'function') return () => {}
+  const registry = ctx?.connection?.fetch
+  if (typeof registry?.register !== 'function') return () => {}
   try {
-    return rpc.handle('dsh_browser_computer_use', async (_endpoint, payload, signal, peer) => {
-      try {
-        const value = await handler(payload || {}, signal, peer)
-        return { ok: true, value }
-      } catch (error) {
-        return { ok: false, error: { code: String(error?.code || 'rpc_error'), message: String(error?.message || error), details: {} } }
-      }
+    return registry.register({
+      path: '/api/dsh-browser-computer-use',
+      methods: ['POST'],
+      requestBody: 'buffered',
+      async fetch(request) {
+        let message
+        try { message = await request.json() } catch {
+          return Response.json({ type: 'server-response', rpcId: 'invalid', result: { ok: false, error: { code: 'browser/bad-request', message: 'Request is not JSON.', details: {} } } }, { status: 400 })
+        }
+        const rpcId = typeof message?.rpcId === 'string' ? message.rpcId : 'invalid'
+        let result
+        try {
+          result = await handler(message?.payload && typeof message.payload === 'object' ? message.payload : {})
+        } catch (error) {
+          result = { ok: false, code: 'rpc_error', message: String(error?.message || error) }
+        }
+        return Response.json({ type: 'server-response', rpcId, result })
+      },
     })
   } catch { return () => {} }
 }
