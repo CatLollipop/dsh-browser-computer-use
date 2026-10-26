@@ -33,6 +33,8 @@ window.__ModuleLoader__.load({
       recent: '最近操作', noRecent: '暂无操作记录。',
       error: '操作失败：', loading: '正在读取配置…', unavailable: '无法连接宿主，请刷新页面后重试。',
       skillsHint: '随插件提供 browser-use 技能：Agent 会按“先观察、再动作、逐步批准”的流程使用浏览器。',
+      statusLabel: '连接状态', browserLabel: '浏览器', lastCheck: '最后检测', neverChecked: '尚未检测', tabsCount: '标签页', stateOn: '已开启', stateOff: '已关闭',
+      connectedTo: '已连接', notConnected: '未连接', disabledState: '未启用',
       noExecutable: '没有找到 Chromium 内核浏览器，请安装 Chrome/Edge，或设置 DSH_BROWSER_EXECUTABLE。',
     }
     const en = {
@@ -64,6 +66,8 @@ window.__ModuleLoader__.load({
       recent: 'Recent actions', noRecent: 'No actions yet.',
       error: 'Something went wrong: ', loading: 'Loading configuration…', unavailable: 'Cannot reach the host. Refresh the page and try again.',
       skillsHint: 'The bundle ships a browser-use skill so the agent follows observe → act → ask → verify.',
+      statusLabel: 'Connection', browserLabel: 'Browser', lastCheck: 'Last check', neverChecked: 'Not checked yet', tabsCount: 'Tabs', stateOn: 'On', stateOff: 'Off',
+      connectedTo: 'Connected', notConnected: 'Not connected', disabledState: 'Disabled',
       noExecutable: 'No Chromium browser found. Install Chrome/Edge or set DSH_BROWSER_EXECUTABLE.',
     }
 
@@ -91,6 +95,9 @@ window.__ModuleLoader__.load({
 .bw-hero-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .bw-hero-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
 .bw-hero-sub { font-size: 12.5px; line-height: 1.55; color: var(--dsw-alias-label-secondary); }
+.bw-hero-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.bw-chip-ok { color: var(--dsw-alias-state-success-primary); border-color: var(--dsw-alias-state-success-primary); }
+.bw-chip-warn { color: var(--dsw-alias-state-warn-primary); border-color: var(--dsw-alias-state-warn-primary); }
 .bw-hintbox { padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-2); font-size: 12.5px; line-height: 1.65; color: var(--dsw-alias-label-secondary); }
 .bw-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .bw-label { font-size: 12.5px; color: var(--dsw-alias-label-secondary); flex: none; }
@@ -153,6 +160,7 @@ window.__ModuleLoader__.load({
       const [loadError, setLoadError] = React.useState('')
       const [sites, setSites] = React.useState([])
       const [siteHost, setSiteHost] = React.useState('')
+      const [lastCheck, setLastCheck] = React.useState('')
 
       const load = React.useCallback(async () => {
         try {
@@ -160,6 +168,7 @@ window.__ModuleLoader__.load({
           setStatus(value)
           setSites(Array.isArray(value?.sites) ? value.sites : [])
           setEndpoint((current) => current || value?.endpoint || '')
+          setLastCheck(new Date().toLocaleTimeString())
           setLoadError('')
         } catch (error) {
           setLoadError(error?.message || t('unavailable'))
@@ -167,6 +176,13 @@ window.__ModuleLoader__.load({
       }, [])
 
       React.useEffect(() => { load() }, [])
+
+      // Keep the connection badge fresh so "connected" is visible without pressing re-check.
+      React.useEffect(() => {
+        if (!status?.enabled) return undefined
+        const timer = setInterval(() => { load() }, 5000)
+        return () => clearInterval(timer)
+      }, [status?.enabled])
 
       async function run(key, task, message) {
         setBusy(key); setNote(''); setNoteOk(false)
@@ -222,23 +238,17 @@ window.__ModuleLoader__.load({
           h('div', { className: 'bw-card-head' },
             h('div', null,
               h('h2', { id: 'bw-title' }, t('name')),
-              h('p', { className: 'bw-muted' }, t('sub'))),
-            h('div', { className: 'bw-switch-row' },
-              h('span', null, t('enable')),
-              h('button', {
-                type: 'button', className: 'bw-switch', role: 'switch',
-                'aria-checked': enabled ? 'true' : 'false',
-                'aria-busy': busy ? 'true' : 'false',
-                'aria-label': `${t('name')} ${t('enable')}`,
-                disabled: Boolean(busy),
-                onClick: toggle,
-              }, h('span', { className: 'bw-thumb' })))),
-          h('div', { className: 'bw-hero' },
+              h('p', { className: 'bw-muted' }, t('sub')))),
+          h('div', { className: 'bw-hero', role: 'status', 'aria-live': 'polite' },
             h('span', { className: 'bw-dot', 'data-tone': tone }),
             h('div', { className: 'bw-hero-body' },
-              h('span', { className: 'bw-hero-title' }, heroTitle),
-              h('span', { className: 'bw-hero-sub' }, heroSub))),
-          !enabled ? h('div', { className: 'bw-hintbox' }, t('offSub')) : null,
+              h('span', { className: 'bw-hero-title' }, `${t('statusLabel')} · ${heroTitle}`),
+              h('span', { className: 'bw-hero-sub' }, heroSub),
+              h('div', { className: 'bw-hero-meta' },
+                enabled && reachable ? h('span', { className: 'bw-chip' }, `${t('browserLabel')}: ${status?.browser || 'Chromium'}`) : null,
+                enabled ? h('span', { className: 'bw-chip' }, `${t('tabsCount')}: ${status?.tabs || 0}`) : null,
+                enabled ? h('span', { className: `bw-chip${reachable ? ' bw-chip-ok' : ' bw-chip-warn'}` }, reachable ? t('connectedTo') : t('notConnected')) : h('span', { className: 'bw-chip' }, t('disabledState')),
+                h('span', { className: 'bw-chip' }, `${t('lastCheck')}: ${lastCheck || t('neverChecked')}`)))),
           h('div', { className: 'bw-row' },
             h('span', { className: 'bw-label' }, t('endpoint')),
             h('input', { className: 'bw-input', value: endpoint, placeholder: 'http://127.0.0.1:9222', onChange: (event) => setEndpoint(event.target.value), 'aria-label': t('endpoint') }),
@@ -306,13 +316,15 @@ window.__ModuleLoader__.load({
             h('div', null,
               h('strong', null, t('cdpLabel')),
               h('p', { className: 'bw-help' }, t('cdpHint'))),
-            h('button', {
-              type: 'button', className: 'bw-switch', role: 'switch',
-              'aria-checked': enabled ? 'true' : 'false',
-              'aria-label': t('cdpLabel'),
-              disabled: Boolean(busy),
-              onClick: toggle,
-            }, h('span', { className: 'bw-thumb' })))) : null
+            h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flex: 'none' } },
+              h('span', { className: 'bw-help' }, enabled ? t('stateOn') : t('stateOff')),
+              h('button', {
+                type: 'button', className: 'bw-switch', role: 'switch',
+                'aria-checked': enabled ? 'true' : 'false',
+                'aria-label': t('cdpLabel'),
+                disabled: Boolean(busy),
+                onClick: toggle,
+              }, h('span', { className: 'bw-thumb' }))))) : null
       )
     }
 
