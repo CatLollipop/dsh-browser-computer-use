@@ -32,14 +32,15 @@ export function assertSafeUrl(value, { allowHosts = [] } = {}) {
   return url.toString()
 }
 
-export function siteModeFor(urlValue, sites = []) {
+export function siteModeFor(urlValue, sites = [], defaultMode = 'ask') {
+  const fallback = ['auto', 'ask', 'block'].includes(defaultMode) ? defaultMode : 'ask'
   let host
-  try { host = new URL(String(urlValue || '')).hostname.toLowerCase() } catch { return 'ask' }
+  try { host = new URL(String(urlValue || '')).hostname.toLowerCase() } catch { return fallback }
   const matched = (sites || []).find((entry) => {
     const target = String(entry?.host || '').trim().toLowerCase().replace(/^\./, '')
     return target && (host === target || host.endsWith(`.${target}`))
   })
-  return matched?.mode || 'ask'
+  return matched?.mode || fallback
 }
 
 export function cdpError(code, message) {

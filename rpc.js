@@ -60,6 +60,7 @@ export function createBrowserController({ policyStore = new PolicyStore() } = {}
         enabled: policy.enabled,
         endpoint: policy.endpoint,
         sites: policy.sites,
+        defaultMode: policy.defaultMode,
         allowRemoteEndpoint: policy.allowRemoteEndpoint,
         browser,
         tabs,
@@ -76,13 +77,17 @@ export function createBrowserController({ policyStore = new PolicyStore() } = {}
       return this.status()
     },
 
-    async configure({ endpoint, sites, allowRemoteEndpoint }) {
+    async configure({ endpoint, sites, defaultMode, allowRemoteEndpoint }) {
       await policyStore.load()
       const patch = {}
       if (endpoint !== undefined) patch.endpoint = normalizeEndpoint(endpoint)
       if (sites !== undefined) {
         if (!Array.isArray(sites)) throw cdpError('CONFIG_INVALID', 'sites 必须是数组。')
         patch.sites = sites
+      }
+      if (defaultMode !== undefined) {
+        if (!['auto', 'ask', 'block'].includes(defaultMode)) throw cdpError('CONFIG_INVALID', 'defaultMode 必须是 auto、ask 或 block。')
+        patch.defaultMode = defaultMode
       }
       if (allowRemoteEndpoint !== undefined) patch.allowRemoteEndpoint = allowRemoteEndpoint === true
       await policyStore.update(patch)
@@ -111,8 +116,8 @@ export function createBrowserController({ policyStore = new PolicyStore() } = {}
     /** Resolve the per-site permission for one action: auto (skip approval), ask (default), block. */
     modeFor(urlValue) {
       const policy = policyStore.policy
-      if (!urlValue) return 'ask'
-      return siteModeFor(urlValue, policy.sites)
+      if (!urlValue) return policy.defaultMode || 'ask'
+      return siteModeFor(urlValue, policy.sites, policy.defaultMode)
     },
 
     async test() {

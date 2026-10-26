@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "CDP 浏览器控制与 Computer Use 安全任务中心：手动启用、按站点授权、逐次审批后再操作真实 Chromium 浏览器",
+  "description": "CDP 浏览器控制：插件管理页提供开关与站点权限，Agent 通过 browser-use 技能和 browser 工具使用完整 Chrome DevTools Protocol",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
@@ -24,6 +24,7 @@
     "README.md",
     "locale/*.json",
     "icon.svg",
+    "skills/**",
     "test/*.test.js"
   ],
   "dsh": {

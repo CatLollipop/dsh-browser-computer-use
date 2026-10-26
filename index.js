@@ -1,13 +1,51 @@
+import { readFile, readdir } from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { classifyAction } from './cdp.js'
 import { createBrowserController, registerRpcRoute } from './rpc.js'
 import { PolicyStore } from './policy.js'
 
 export const inject = ['connection', 'tools']
 
+const SKILLS_DIR = fileURLToPath(new URL('./skills/', import.meta.url))
+
+function parseFrontmatter(source) {
+  const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(source)
+  if (!match) return { data: {}, body: source }
+  const data = {}
+  for (const line of match[1].split(/\r?\n/)) {
+    const idx = line.indexOf(':')
+    if (idx <= 0) continue
+    const key = line.slice(0, idx).trim()
+    let value = line.slice(idx + 1).trim()
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1)
+    data[key] = value
+  }
+  return { data, body: match[2] }
+}
+
+async function loadBrowserSkills() {
+  const entries = await readdir(SKILLS_DIR, { withFileTypes: true }).catch(() => [])
+  const skills = []
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue
+    try {
+      const source = await readFile(path.join(SKILLS_DIR, entry.name, 'SKILL.md'), 'utf8')
+      const { data, body } = parseFrontmatter(source)
+      const name = String(data.name || entry.name).trim()
+      const description = String(data.description || '').trim()
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name) || !description) continue
+      skills.push({ name, description, content: body.trim() })
+    } catch {}
+  }
+  return skills
+}
+
 const MUTATING = new Set(['open', 'navigate', 'click', 'type', 'key', 'scroll', 'activate', 'closeTab'])
 
 const PROMPT = [
-  'The browser tool controls a real Chromium browser over CDP, but only after the user enables it in Settings → 浏览器 (no sidebar icon is added).',
+  'The browser tool controls a real Chromium browser over CDP, but only after the user enables it in the plugin configuration page: Settings → Plugins → dsh-browser-computer-use (no sidebar icon is added).',
   'Read-only actions (status, tabs, read, screenshot) work once enabled.',
   'Mutating actions (open, navigate, click, type, key, scroll, closeTab) always ask the user for one-time approval; a denied approval must not be retried in a loop.',
   'Never type credentials, cookies, or payment data. Password fields are refused by the browser tool.',
@@ -136,10 +174,39 @@ export function apply(ctx) {
     })
   } catch {}
 
+  function registerSkills(host) {
+    try {
+      const stop = host.inject(['skills'], (skillsCtx) => {
+        void loadBrowserSkills().then((skills) => {
+          for (const skill of skills) {
+            try {
+              skillsCtx.skills.register({
+                name: skill.name,
+                description: skill.description,
+                content: skill.content,
+                whenToUse: skill.description,
+                source: 'bundled',
+                provider: 'dsh-browser-computer-use',
+                invocation: { modelInvocable: true, userInvocable: true },
+              })
+            } catch {}
+          }
+        }).catch(() => {})
+        return () => {}
+      })
+      return typeof stop === 'function' ? stop : () => {}
+    } catch {
+      return () => {}
+    }
+  }
+
+  const disposeSkills = registerSkills(ctx)
+
   ctx.effect(() => () => {
     try { disposeTool?.() } catch {}
     try { disposeRoute?.() } catch {}
     try { disposePrompt?.() } catch {}
+    try { disposeSkills?.() } catch {}
   })
 
   return controller

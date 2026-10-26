@@ -1,6 +1,11 @@
 # dsh-browser-computer-use
 
-通过 **Chrome DevTools Protocol (CDP)** 控制一个真实的 Chromium 内核浏览器。默认关闭，必须由用户在 **DeepSeek Harness → 设置 → 浏览器** 中手动开启；所有写操作默认逐次审批。
+通过 **Chrome DevTools Protocol (CDP)** 控制一个真实的 Chromium 内核浏览器。能力分为两部分：
+
+1. **插件配置**（给人）：在 **设置 → 插件 → dsh-browser-computer-use** 的配置页里开关 CDP、设置调试地址、启动浏览器、配置网站权限；
+2. **技能使用**（给 Agent）：随插件提供 `browser-use` 技能与 `browser` 工具，Agent 按“先观察 → 再动作 → 逐步审批 → 复核”的流程使用浏览器。
+
+默认关闭，必须由用户在插件配置页手动开启；所有写操作默认逐次审批。
 
 > 安全边界：不读取 Cookie、不填写密码框、不访问 `file:`/`data:`/`javascript:`/`chrome://` 等协议、不提供远程调试之外的私有接口。
 
@@ -12,13 +17,13 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 
 安装后：
 
-- 设置里多出 **浏览器** 页：CDP 开关、调试地址、启动浏览器、网站权限；
-- 不再新增左侧栏图标；标签页、导航、读取页面、截图、操作记录都在 **设置 → 浏览器** 页内；
-- 模型获得 `browser` 工具（需先手动开启 CDP）。
+- **设置 → 插件 → dsh-browser-computer-use** 的齿轮/配置页打开浏览器配置（CDP 开关、调试地址、启动浏览器、默认与按站点权限、最近操作）；
+- 不新增左侧栏图标，也不占用设置左侧的独立页；
+- Agent 获得 `browser-use` 技能与 `browser` 工具（需先手动开启 CDP）。
 
 ## 手动开启 CDP
 
-1. **设置 → 浏览器 → 启用 CDP 浏览器控制** 打开。
+1. **设置 → 插件 → dsh-browser-computer-use → 配置**，打开 **启用 CDP 浏览器控制**。
 2. 调试地址默认 `http://127.0.0.1:9222`。
 3. 点 **启动浏览器**：插件会以独立配置目录（`$DSH_HOME/browser-computer-use/profile`）启动本机 Chromium 内核浏览器，并监听该端口；也可以自己启动：
 
@@ -31,7 +36,7 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 
 支持的浏览器：Chrome、Chrome Canary、Chromium、Microsoft Edge、Brave，以及 Playwright 缓存里的 “Google Chrome for Testing”。也可用 `DSH_BROWSER_EXECUTABLE` 指定可执行文件；`DSH_BROWSER_HEADLESS=1` 可让启动器以 headless 模式启动（用于验证或服务器环境）。
 
-4. 点 **重新检测**，状态变为「已连接」后，页面下方的标签页、导航、读取、截图与操作记录即可使用。
+4. 点 **重新检测**，状态变为「已连接」后，Agent 即可调用 `browser` 工具；人工不需要单独的浏览器面板。
 
 ## 网站权限（设置内配置）
 
@@ -54,6 +59,10 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 | `history` | 最近操作记录 | 只读 |
 
 写操作在 `ask` 站点下会调用 DSH 的审批通道（一次性批准）；被拒绝时工具返回 `APPROVAL_REQUIRED`，代理不会循环重试。截图会同时落盘并作为图片附件进入对话。
+
+### 技能 `browser-use`
+
+`skills/browser-use/SKILL.md` 在插件加载时注册进技能目录（`ctx.skills`），内容覆盖：何时使用真实浏览器、启用前提、观察→动作→复核循环、站点权限语义、密码/凭证禁令、以及 `BROWSER_DISABLED`、`APPROVAL_REQUIRED`、`SELECTOR_NOT_FOUND` 等错误的处理方式。模型在会话里按需加载，不需要把长流程塞进系统提示。
 
 ## 安全限制
 
@@ -86,8 +95,9 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 | `policy.js` | 策略存储：开关、端点、网站权限、操作记录（`$DSH_HOME/browser-computer-use/policy.json`） |
 | `launcher.js` | 发现并启动本机 Chromium 内核浏览器（独立配置目录） |
 | `rpc.js` | 控制器与 `/api/dsh-browser-computer-use` 路由 |
-| `client.js` | 设置页 + 浏览器面板 |
-| `test/rpc.test.js` | 端点、URL 守卫、分级、策略测试 |
+| `client.js` | 插件配置页（`plugins.row.config` / `plugins.bundle.config`），Canva 风格卡片与开关 |
+| `skills/browser-use/SKILL.md` | 随插件分发的 Agent 使用技能 |
+| `test/rpc.test.js` | 端点、URL 守卫、分级、策略、默认站点权限测试 |
 
 ## 仓库
 

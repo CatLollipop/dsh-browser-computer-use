@@ -42,4 +42,7 @@ test('policy normalization keeps safety defaults', () => {
 
   const legacy = normalizePolicy({ allowHosts: ['legacy.test'] })
   assert.deepEqual(legacy.sites, [{ host: 'legacy.test', mode: 'auto' }])
+  assert.equal(policy.defaultMode, 'ask')
+  assert.equal(normalizePolicy({ defaultMode: 'block' }).defaultMode, 'block')
+  assert.equal(normalizePolicy({ defaultMode: 'nope' }).defaultMode, 'ask')
 })

@@ -1,345 +1,340 @@
 window.__ModuleLoader__.load({
   id: '@local/dsh-browser-computer-use',
   factory(require) {
-    const React = require('react');
-    const h = React.createElement;
+    const React = require('react')
+    const h = React.createElement
 
     const zh = {
       title: '浏览器',
-      subtitle: '通过 Chrome DevTools Protocol 控制一个真实的 Chromium 浏览器。必须先在这里手动开启；所有写操作默认逐次审批。',
-      settingsTitle: '浏览器设置',
-      settingsDesc: '控制 CDP 开关、调试端口和每个网站的操作权限。设置只影响这台机器上的浏览器控制插件。',
-      enabled: '启用 CDP 浏览器控制',
-      enabledHint: '关闭后立即断开调试通道，代理无法再操作浏览器。',
-      endpoint: '调试地址',
-      endpointHint: '默认 http://127.0.0.1:9222。使用「启动浏览器」会以独立配置目录启动并监听该端口。',
-      saveEndpoint: '保存地址',
-      launch: '启动浏览器',
-      test: '重新检测',
-      sites: '网站权限',
-      sitesHint: 'auto：该网站的点击/输入等操作不再逐次审批；ask：每次操作都询问；block：完全禁止访问。',
-      hostPlaceholder: 'example.com',
-      addSite: '添加网站',
-      modeAuto: '自动允许', modeAsk: '每次询问', modeBlock: '禁止',
-      remove: '移除',
-      connected: '已连接', disconnected: '未连接', disabled: '未启用',
-      browser: '浏览器', tabs: '标签页', noTabs: '没有可控制的标签页。',
-      tabsTitle: '标签页', activate: '切换', close: '关闭',
-      navigatePlaceholder: 'https://example.com', go: '打开',
-      read: '读取页面', screenshot: '截图',
-      pageTitle: '页面内容', noPage: '还没有读取页面。',
-      preview: '截图预览',
-      history: '操作记录', noHistory: '暂无操作记录。', clearHistory: '清空记录',
-      loading: '加载中…', saved: '已保存。', launched: '浏览器已启动。',
-      error: '操作失败：', unavailable: '无法连接宿主，请刷新页面。',
-      executableMissing: '没有找到 Chromium 内核浏览器，请安装 Chrome/Edge 或设置 DSH_BROWSER_EXECUTABLE。',
-      approvalNote: '注意：代理在对话中执行写操作时会请求你一次性批准；截图不会自动脱敏，可能包含页面上的敏感信息。',
-      stateOn: '已开启', stateOff: '已关闭',
-    };
+      intro: '为 Agent 提供真实 Chromium 浏览器的控制能力：读取页面、点击、输入、截图。默认关闭，需要在这里手动开启。',
+      privacy: '写操作默认逐次请求你的批准；密码框、cookie、文件协议与私有接口都被拒绝。',
+      usage: '开启后，Agent 通过 browser-use 技能与 browser 工具工作：先看状态，再读页面，写操作前请求批准。',
+      name: 'CDP 浏览器控制',
+      sub: 'Chrome DevTools Protocol · 本机独立配置目录',
+      enable: '启用',
+      on: '已连接', off: '未启用', wait: '未连接调试端口',
+      offSub: '打开右侧开关后，插件会连接调试端口；如果还没有浏览器，点「启动浏览器」以独立配置启动一个。',
+      waitSub: '已启用，但还没有连上调试端口。请启动浏览器或检查地址。',
+      onSub: '浏览器已就绪，Agent 可以读取页面并在你批准后执行写操作。',
+      tabsUnit: '个标签页',
+      retest: '重新检测', launch: '启动浏览器', clear: '清空记录', working: '正在处理…',
+      connected: '连接成功。', launched: '浏览器已启动。', revoked: '已清空操作记录。', failed: '操作失败。',
+      endpoint: '调试地址', saveEndpoint: '保存地址',
+      permissions: '浏览器权限',
+      historyLabel: '历史记录', historyHint: 'Agent 读取你自己的浏览历史前必须先询问。', alwaysAsk: '始终询问',
+      defaultMode: '默认网站权限', defaultModeHint: '没有单独设置的网站使用这个默认权限。',
+      sitePerms: '网站权限', sitePermsHint: '设置默认权限，并为特定网站单独配置例外。',
+      defaultRow: '默认', addSite: '添加', hostPlaceholder: 'example.com',
+      browse: '操作', modeAuto: '自动允许', modeAsk: '需要批准', modeBlock: '禁止',
+      remove: '移除', emptySites: '还没有自定义权限的网站。',
+      developer: '开发者模式', risk: '风险升级',
+      cdpLabel: '启用完整 CDP 访问权限',
+      cdpHint: '允许 Agent 在已连接的浏览器会话中使用完整的 Chrome DevTools Protocol 检查并控制浏览器内部功能，可能使你的数据面临风险。',
+      recent: '最近操作', noRecent: '暂无操作记录。',
+      error: '操作失败：', loading: '正在读取配置…', unavailable: '无法连接宿主，请刷新页面后重试。',
+      skillsHint: '随插件提供 browser-use 技能：Agent 会按“先观察、再动作、逐步批准”的流程使用浏览器。',
+      noExecutable: '没有找到 Chromium 内核浏览器，请安装 Chrome/Edge，或设置 DSH_BROWSER_EXECUTABLE。',
+    }
     const en = {
       title: 'Browser',
-      subtitle: 'Control a real Chromium browser over the Chrome DevTools Protocol. You must turn it on here first; every write action asks for approval by default.',
-      settingsTitle: 'Browser settings',
-      settingsDesc: 'Control the CDP switch, debug endpoint, and per-site permissions for this plugin.',
-      enabled: 'Enable CDP browser control',
-      enabledHint: 'Turning it off disconnects the debug channel immediately, so the agent can no longer act.',
-      endpoint: 'Debug endpoint',
-      endpointHint: 'Defaults to http://127.0.0.1:9222. Launch starts an isolated browser profile listening on this port.',
-      saveEndpoint: 'Save endpoint',
-      launch: 'Launch browser',
-      test: 'Re-check',
-      sites: 'Site permissions',
-      sitesHint: 'auto: clicks/typing on this site skip per-action approval; ask: ask every time; block: never allow.',
-      hostPlaceholder: 'example.com',
-      addSite: 'Add site',
-      modeAuto: 'Auto allow', modeAsk: 'Ask each time', modeBlock: 'Block',
-      remove: 'Remove',
-      connected: 'Connected', disconnected: 'Not connected', disabled: 'Disabled',
-      browser: 'Browser', tabs: 'Tabs', noTabs: 'No controllable tabs.',
-      tabsTitle: 'Tabs', activate: 'Switch', close: 'Close',
-      navigatePlaceholder: 'https://example.com', go: 'Open',
-      read: 'Read page', screenshot: 'Screenshot',
-      pageTitle: 'Page content', noPage: 'Nothing read yet.',
-      preview: 'Screenshot preview',
-      history: 'Action log', noHistory: 'No actions yet.', clearHistory: 'Clear log',
-      loading: 'Loading…', saved: 'Saved.', launched: 'Browser launched.',
-      error: 'Something went wrong: ', unavailable: 'Cannot reach the host. Refresh the page.',
-      executableMissing: 'No Chromium browser found. Install Chrome/Edge or set DSH_BROWSER_EXECUTABLE.',
-      approvalNote: 'Note: agent write actions in chat ask for one-time approval. Screenshots are not redacted and may contain sensitive page content.',
-      stateOn: 'On', stateOff: 'Off',
-    };
+      intro: 'Give the agent control of a real Chromium browser: read pages, click, type, and capture screenshots. Off by default; enable it here first.',
+      privacy: 'Write actions ask for your approval each time; password fields, cookies, file URLs, and private endpoints are refused.',
+      usage: 'Once enabled the agent works through the browser-use skill and the browser tool: check status, read the page, then ask before writing.',
+      name: 'CDP browser control',
+      sub: 'Chrome DevTools Protocol · isolated local profile',
+      enable: 'Enable',
+      on: 'Connected', off: 'Disabled', wait: 'Debug port not reachable',
+      offSub: 'Turn the switch on to connect to the debug port; if no browser is running, press Launch browser to start one with an isolated profile.',
+      waitSub: 'Enabled, but the debug port is not reachable yet. Launch a browser or check the address.',
+      onSub: 'Browser is ready; the agent can read pages and, with your approval, act.',
+      tabsUnit: 'tabs',
+      retest: 'Re-check', launch: 'Launch browser', clear: 'Clear log', working: 'Working…',
+      connected: 'Connected.', launched: 'Browser launched.', revoked: 'Action log cleared.', failed: 'Something went wrong.',
+      endpoint: 'Debug endpoint', saveEndpoint: 'Save endpoint',
+      permissions: 'Browser permissions',
+      historyLabel: 'Browsing history', historyHint: 'The agent must ask before reading your browsing history.', alwaysAsk: 'Always ask',
+      defaultMode: 'Default site permission', defaultModeHint: 'Sites without an override use this permission.',
+      sitePerms: 'Site permissions', sitePermsHint: 'Set a default and configure per-site exceptions.',
+      defaultRow: 'Default', addSite: 'Add', hostPlaceholder: 'example.com',
+      browse: 'Actions', modeAuto: 'Auto allow', modeAsk: 'Needs approval', modeBlock: 'Block',
+      remove: 'Remove', emptySites: 'No custom site permissions yet.',
+      developer: 'Developer mode', risk: 'Elevated risk',
+      cdpLabel: 'Enable full CDP access',
+      cdpHint: 'Let the agent use the full Chrome DevTools Protocol inside a connected browser session to inspect and control sensitive internals; this may put your data at risk.',
+      recent: 'Recent actions', noRecent: 'No actions yet.',
+      error: 'Something went wrong: ', loading: 'Loading configuration…', unavailable: 'Cannot reach the host. Refresh the page and try again.',
+      skillsHint: 'The bundle ships a browser-use skill so the agent follows observe → act → ask → verify.',
+      noExecutable: 'No Chromium browser found. Install Chrome/Edge or set DSH_BROWSER_EXECUTABLE.',
+    }
+
+    const CSS = `
+.bw-page { box-sizing: border-box; max-width: 680px; margin: 0 auto; padding: 8px 4px 24px; color: var(--dsw-alias-label-primary); font: inherit; }
+.bw-page * { box-sizing: border-box; }
+.bw-head h1 { margin: 0 0 8px; font-size: 20px; font-weight: 600; line-height: 1.3; }
+.bw-head p, .bw-help, .bw-muted { margin: 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 1.5; }
+.bw-head p + p { margin-top: 4px; }
+.bw-card { margin-top: 16px; background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l1); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.bw-card-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.bw-card h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.1px; }
+.bw-card-head .bw-muted { margin-top: 4px; }
+.bw-switch-row { display: flex; align-items: center; gap: 10px; flex: none; font-size: 12px; color: var(--dsw-alias-label-secondary); }
+.bw-switch { width: 42px; height: 24px; border-radius: 999px; border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-2); padding: 0; position: relative; cursor: pointer; transition: background-color .16s ease, border-color .16s ease; }
+.bw-switch[aria-checked="true"] { background: var(--dsw-alias-brand-primary); border-color: var(--dsw-alias-brand-primary); }
+.bw-thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--dsw-alias-bg-base); box-shadow: 0 1px 2px rgba(0,0,0,.18); transition: left .16s ease; }
+.bw-switch[aria-checked="true"] .bw-thumb { left: 20px; }
+.bw-switch:disabled { cursor: default; opacity: .6; }
+.bw-hero { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l1); }
+.bw-dot { flex: none; width: 9px; height: 9px; margin-top: 5px; border-radius: 50%; background: var(--dsw-alias-state-idle-primary); }
+.bw-dot[data-tone="on"] { background: var(--dsw-alias-state-success-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--dsw-alias-state-success-primary) 18%, transparent); }
+.bw-dot[data-tone="wait"] { background: var(--dsw-alias-state-warn-primary); animation: bw-pulse 1.4s ease-in-out infinite; }
+@keyframes bw-pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+.bw-hero-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.bw-hero-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.bw-hero-sub { font-size: 12.5px; line-height: 1.55; color: var(--dsw-alias-label-secondary); }
+.bw-hintbox { padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-2); font-size: 12.5px; line-height: 1.65; color: var(--dsw-alias-label-secondary); }
+.bw-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bw-label { font-size: 12.5px; color: var(--dsw-alias-label-secondary); flex: none; }
+.bw-input { flex: 1; min-width: 160px; min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); font: inherit; font-size: 13px; }
+.bw-select { min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); font: inherit; font-size: 13px; }
+.bw-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.bw-primary { min-height: 32px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--dsw-alias-brand-primary); background: var(--dsw-alias-brand-primary); color: var(--dsw-alias-bg-base); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+.bw-secondary { min-height: 32px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); font: inherit; font-size: 13px; cursor: pointer; }
+.bw-link { padding: 0; border: 0; background: none; color: var(--dsw-alias-brand-primary); font: inherit; font-size: 12.5px; cursor: pointer; }
+.bw-page button:disabled { cursor: default; opacity: .55; }
+.bw-page :focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: 2px; }
+.bw-section-title { margin: 0; font-size: 15px; font-weight: 600; }
+.bw-split { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; border-top: 1px solid var(--dsw-alias-border-l1); padding-top: 14px; }
+.bw-split:first-of-type { border-top: 0; padding-top: 0; }
+.bw-split strong { display: block; font-size: 13.5px; font-weight: 600; }
+.bw-split .bw-help { margin-top: 3px; }
+.bw-table { border: 1px solid var(--dsw-alias-border-l1); border-radius: 10px; overflow: hidden; }
+.bw-thead, .bw-trow { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 10px 14px; }
+.bw-thead { background: var(--dsw-alias-bg-layer-2); font-size: 12px; color: var(--dsw-alias-label-secondary); }
+.bw-trow { border-top: 1px solid var(--dsw-alias-border-l1); font-size: 13px; }
+.bw-trow .bw-host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bw-risk { border: 1px solid var(--dsw-alias-state-warn-primary); border-radius: 12px; padding: 16px; background: var(--dsw-alias-bg-layer-1); display: flex; flex-direction: column; gap: 10px; }
+.bw-risk-head { display: flex; align-items: center; gap: 8px; color: var(--dsw-alias-state-warn-primary); font-size: 12.5px; font-weight: 600; }
+.bw-risk-row { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
+.bw-risk-row strong { display: block; font-size: 13.5px; font-weight: 600; }
+.bw-risk-row .bw-help { margin-top: 4px; }
+.bw-ok { margin: 0; color: var(--dsw-alias-state-success-primary); font-size: 12.5px; }
+.bw-error, .bw-note { margin: 0; color: var(--dsw-alias-state-error-primary); font-size: 12.5px; line-height: 1.5; }
+.bw-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.bw-chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--dsw-alias-border-l1); background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary); font-size: 11.5px; line-height: 18px; }
+`
 
     function dictOf(ctx) {
-      let active = 'en';
-      try { active = String(ctx.locale?.getSnapshot?.()?.active || 'en'); } catch {}
-      return active.toLowerCase().startsWith('zh') ? { ...en, ...zh } : en;
+      try {
+        const active = String(ctx.locale?.getSnapshot?.()?.active || 'en')
+        return active.toLowerCase().startsWith('zh') ? zh : en
+      } catch { return en }
     }
-    const t = (ctx, key) => dictOf(ctx)[key] ?? key;
+    const translate = (ctx, key) => dictOf(ctx)[key] ?? key
 
-    const S = {
-      page: { color: 'var(--dsw-alias-label-primary)', background: 'var(--dsw-alias-bg-base)', minHeight: '100%', padding: '24px 28px 40px', boxSizing: 'border-box' },
-      wrap: { maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 18 },
-      head: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 },
-      title: { margin: 0, fontSize: 22, fontWeight: 600, lineHeight: 1.3 },
-      sub: { margin: '6px 0 0', fontSize: 13, lineHeight: 1.6, color: 'var(--dsw-alias-label-secondary)', maxWidth: 660 },
-      card: { border: '1px solid var(--dsw-alias-border-l1)', background: 'var(--dsw-alias-bg-layer-1)', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 },
-      row: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
-      label: { fontSize: 12.5, color: 'var(--dsw-alias-label-secondary)' },
-      input: { flex: 1, minWidth: 180, boxSizing: 'border-box', borderRadius: 8, padding: '9px 11px', color: 'var(--dsw-alias-label-primary)', background: 'var(--dsw-alias-bg-layer-2)', border: '1px solid var(--dsw-alias-border-l1)', fontSize: 13.5 },
-      select: { borderRadius: 8, padding: '8px 10px', color: 'var(--dsw-alias-label-primary)', background: 'var(--dsw-alias-bg-layer-2)', border: '1px solid var(--dsw-alias-border-l1)', fontSize: 13 },
-      primary: { border: 0, borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 500, cursor: 'pointer', color: 'var(--dsw-alias-bg-base)', background: 'var(--dsw-alias-brand-primary)' },
-      ghost: { border: '1px solid var(--dsw-alias-border-l2)', background: 'transparent', color: 'var(--dsw-alias-label-primary)', borderRadius: 8, padding: '7px 12px', fontSize: 13, cursor: 'pointer' },
-      danger: { border: '1px solid var(--dsw-alias-border-l2)', background: 'transparent', color: 'var(--dsw-alias-state-error-primary)', borderRadius: 8, padding: '7px 12px', fontSize: 13, cursor: 'pointer' },
-      disabled: { opacity: .55, cursor: 'default' },
-      pill: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 999, border: '1px solid var(--dsw-alias-border-l1)', background: 'var(--dsw-alias-bg-layer-2)', fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)', whiteSpace: 'nowrap' },
-      ok: { color: 'var(--dsw-alias-state-success-primary)', borderColor: 'var(--dsw-alias-state-success-primary)' },
-      bad: { color: 'var(--dsw-alias-state-warn-primary)', borderColor: 'var(--dsw-alias-state-warn-primary)' },
-      error: { padding: '10px 12px', borderRadius: 9, border: '1px solid var(--dsw-alias-state-error-primary)', background: 'var(--dsw-alias-bg-layer-2)', color: 'var(--dsw-alias-state-error-primary)', fontSize: 13 },
-      empty: { padding: '22px 12px', textAlign: 'center', fontSize: 13, color: 'var(--dsw-alias-label-secondary)', border: '1px dashed var(--dsw-alias-border-l1)', borderRadius: 10 },
-      mono: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 12 },
-      text: { fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-wrap', maxHeight: 320, overflow: 'auto', background: 'var(--dsw-alias-bg-layer-2)', borderRadius: 8, padding: 12 },
-      img: { maxWidth: '100%', borderRadius: 10, border: '1px solid var(--dsw-alias-border-l1)' },
-    };
-
-    async function callRpc(ctx, payload) {
-      const rpc = ctx.connection?.rpc;
-      if (!rpc?.call) throw new Error(t(ctx, 'unavailable'));
-      const reply = await rpc.call('/api', 'dsh-browser-computer-use', payload);
+    async function callHost(ctx, payload) {
+      const rpc = ctx.connection?.rpc
+      if (!rpc?.call) throw new Error(translate(ctx, 'unavailable'))
+      const reply = await rpc.call('/api', 'dsh-browser-computer-use', payload)
       if (reply?.ok === false) {
-        const error = new Error(reply.error?.message || 'RPC failed');
-        error.code = reply.error?.code;
-        throw error;
+        const error = new Error(reply.error?.message || translate(ctx, 'failed'))
+        error.code = reply.error?.code
+        throw error
       }
-      return reply && typeof reply === 'object' && 'value' in reply ? reply.value : reply;
+      return reply && typeof reply === 'object' && 'value' in reply ? reply.value : reply
     }
 
-    function StatusPill({ ctx, status }) {
-      if (!status) return h('span', { style: S.pill }, t(ctx, 'loading'));
-      const tone = !status.enabled ? {} : status.reachable ? S.ok : S.bad;
-      const text = !status.enabled ? t(ctx, 'disabled') : status.reachable ? t(ctx, 'connected') : t(ctx, 'disconnected');
-      return h('span', { style: { ...S.pill, ...tone } }, text);
-    }
-
-    function SettingsPage({ ctx }) {
-      const [status, setStatus] = React.useState(null);
-      const [endpoint, setEndpoint] = React.useState('');
-      const [siteHost, setSiteHost] = React.useState('');
-      const [siteMode, setSiteMode] = React.useState('ask');
-      const [busy, setBusy] = React.useState('');
-      const [error, setError] = React.useState('');
-      const [notice, setNotice] = React.useState('');
-      const t0 = (key) => t(ctx, key);
+    function ConfigPage({ ctx }) {
+      const t = (key) => translate(ctx, key)
+      const [status, setStatus] = React.useState(null)
+      const [endpoint, setEndpoint] = React.useState('')
+      const [busy, setBusy] = React.useState('')
+      const [note, setNote] = React.useState('')
+      const [noteOk, setNoteOk] = React.useState(false)
+      const [loadError, setLoadError] = React.useState('')
+      const [sites, setSites] = React.useState([])
+      const [siteHost, setSiteHost] = React.useState('')
 
       const load = React.useCallback(async () => {
         try {
-          const value = await callRpc(ctx, { action: 'status' });
-          setStatus(value);
-          setEndpoint((current) => current || value?.endpoint || '');
-        } catch (cause) { setError(cause?.message || t0('unavailable')); }
-      }, []);
+          const value = await callHost(ctx, { action: 'status' })
+          setStatus(value)
+          setSites(Array.isArray(value?.sites) ? value.sites : [])
+          setEndpoint((current) => current || value?.endpoint || '')
+          setLoadError('')
+        } catch (error) {
+          setLoadError(error?.message || t('unavailable'))
+        }
+      }, [])
 
-      React.useEffect(() => { load(); }, []);
+      React.useEffect(() => { load() }, [])
 
-      async function run(name, task, message) {
-        setBusy(name); setError(''); setNotice('');
+      async function run(key, task, message) {
+        setBusy(key); setNote(''); setNoteOk(false)
         try {
-          const value = await task();
-          if (message) setNotice(message);
-          await load();
-          return value;
-        } catch (cause) { setError(cause?.message || t0('error')); return null; }
-        finally { setBusy(''); }
+          const value = await task()
+          await load()
+          if (message) { setNote(message); setNoteOk(true) }
+          return value
+        } catch (error) {
+          setNote(error?.message || t('failed')); setNoteOk(false); return null
+        } finally { setBusy('') }
       }
 
-      const disabled = busy !== '';
+      async function saveSites(next) {
+        setSites(next)
+        await run('site', () => callHost(ctx, { action: 'configure', sites: next }))
+      }
 
-      const header = h('header', null,
-        h('h2', { style: { margin: 0, fontSize: 18, fontWeight: 600 } }, t0('settingsTitle')),
-        h('p', { style: { margin: '6px 0 0', fontSize: 13, lineHeight: 1.6, color: 'var(--dsw-alias-label-secondary)' } }, t0('settingsDesc')));
+      const enabled = Boolean(status?.enabled)
+      const reachable = Boolean(status?.reachable)
+      const tone = !enabled ? 'idle' : reachable ? 'on' : 'wait'
+      const heroTitle = !enabled ? t('off') : reachable ? t('on') : t('wait')
+      const heroSub = !enabled
+        ? t('offSub')
+        : reachable
+          ? `${status?.browser || 'Chromium'} · ${status?.tabs || 0} ${t('tabsUnit')} · ${t('onSub')}`
+          : t('waitSub')
 
-      const toggle = h('div', { style: { ...S.row, justifyContent: 'space-between' } },
-        h('div', null,
-          h('div', { style: { fontSize: 13.5, fontWeight: 500 } }, t0('enabled')),
-          h('div', { style: { ...S.label, marginTop: 4 } }, t0('enabledHint'))),
-        h('label', { style: { display: 'flex', alignItems: 'center', gap: 8 } },
-          h('input', {
-            type: 'checkbox', role: 'switch', checked: Boolean(status?.enabled), disabled,
-            onChange: (e) => run('toggle', () => callRpc(ctx, { action: 'enable', enabled: e.target.checked })),
-          }),
-          h('span', { style: S.label }, status?.enabled ? t0('stateOn') : t0('stateOff'))));
+      function toggle() {
+        if (busy) return
+        void run('toggle', () => callHost(ctx, { action: 'enable', enabled: !enabled }))
+      }
 
-      const endpointRow = h('div', { style: S.row },
-        h('span', { style: S.label }, t0('endpoint')),
-        h('input', { value: endpoint, onChange: (e) => setEndpoint(e.target.value), placeholder: 'http://127.0.0.1:9222', style: S.input, 'aria-label': t0('endpoint') }),
-        h('button', { type: 'button', disabled, style: { ...S.ghost, ...(disabled ? S.disabled : {}) }, onClick: () => run('endpoint', () => callRpc(ctx, { action: 'configure', endpoint }), t0('saved')) }, t0('saveEndpoint')));
+      function addSite() {
+        const host = siteHost.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+        if (!host) return
+        const next = [...sites.filter((row) => row.host !== host), { host, mode: 'ask' }]
+        setSiteHost('')
+        void saveSites(next)
+      }
 
-      const connectionRow = h('div', { style: S.row },
-        h('button', { type: 'button', disabled, style: { ...S.primary, ...(disabled ? S.disabled : {}) }, onClick: () => run('launch', () => callRpc(ctx, { action: 'launch' }), t0('launched')) }, busy === 'launch' ? t0('loading') : t0('launch')),
-        h('button', { type: 'button', disabled, style: { ...S.ghost, ...(disabled ? S.disabled : {}) }, onClick: () => run('test', () => callRpc(ctx, { action: 'test' })) }, t0('test')),
-        h(StatusPill, { ctx, status }),
-        status?.browser ? h('span', { style: S.label }, `${t0('browser')}: ${status.browser} · ${t0('tabs')}: ${status.tabs}`) : null);
+      return h('div', { className: 'bw-page' },
+        h('style', null, CSS),
+        h('header', { className: 'bw-head' },
+          h('h1', null, t('title')),
+          h('p', null, t('intro')),
+          h('p', null, t('privacy')),
+          h('p', null, t('usage'))),
+        loadError ? h('p', { className: 'bw-error', role: 'alert' }, loadError) : null,
+        !status && !loadError ? h('p', { className: 'bw-muted' }, t('loading')) : null,
 
-      const siteRow = (site) => h('div', { key: site.host, style: { ...S.row, justifyContent: 'space-between', border: '1px solid var(--dsw-alias-border-l1)', borderRadius: 8, padding: '8px 10px' } },
-        h('span', { style: S.mono }, site.host),
-        h('div', { style: { display: 'flex', gap: 8, alignItems: 'center' } },
-          h('select', {
-            value: site.mode, style: S.select, 'aria-label': `${site.host} ${t0('sites')}`,
-            onChange: (e) => run('site', () => callRpc(ctx, { action: 'setSite', host: site.host, mode: e.target.value })),
-          },
-            h('option', { value: 'auto' }, t0('modeAuto')),
-            h('option', { value: 'ask' }, t0('modeAsk')),
-            h('option', { value: 'block' }, t0('modeBlock'))),
-          h('button', { type: 'button', style: S.danger, onClick: () => run('site', () => callRpc(ctx, { action: 'removeSite', host: site.host })) }, t0('remove'))));
+        status ? h('section', { className: 'bw-card', 'aria-labelledby': 'bw-title' },
+          h('div', { className: 'bw-card-head' },
+            h('div', null,
+              h('h2', { id: 'bw-title' }, t('name')),
+              h('p', { className: 'bw-muted' }, t('sub'))),
+            h('div', { className: 'bw-switch-row' },
+              h('span', null, t('enable')),
+              h('button', {
+                type: 'button', className: 'bw-switch', role: 'switch',
+                'aria-checked': enabled ? 'true' : 'false',
+                'aria-busy': busy ? 'true' : 'false',
+                'aria-label': `${t('name')} ${t('enable')}`,
+                disabled: Boolean(busy),
+                onClick: toggle,
+              }, h('span', { className: 'bw-thumb' })))),
+          h('div', { className: 'bw-hero' },
+            h('span', { className: 'bw-dot', 'data-tone': tone }),
+            h('div', { className: 'bw-hero-body' },
+              h('span', { className: 'bw-hero-title' }, heroTitle),
+              h('span', { className: 'bw-hero-sub' }, heroSub))),
+          !enabled ? h('div', { className: 'bw-hintbox' }, t('offSub')) : null,
+          h('div', { className: 'bw-row' },
+            h('span', { className: 'bw-label' }, t('endpoint')),
+            h('input', { className: 'bw-input', value: endpoint, placeholder: 'http://127.0.0.1:9222', onChange: (event) => setEndpoint(event.target.value), 'aria-label': t('endpoint') }),
+            h('button', { type: 'button', className: 'bw-secondary', disabled: Boolean(busy), onClick: () => run('endpoint', () => callHost(ctx, { action: 'configure', endpoint }), t('connected')) }, t('saveEndpoint'))),
+          h('div', { className: 'bw-actions' },
+            h('button', { type: 'button', className: 'bw-primary', disabled: Boolean(busy), onClick: () => run('launch', () => callHost(ctx, { action: 'launch' }), t('launched')) }, busy === 'launch' ? t('working') : t('launch')),
+            h('button', { type: 'button', className: 'bw-secondary', disabled: Boolean(busy), onClick: () => run('test', () => callHost(ctx, { action: 'test' }), t('connected')) }, busy === 'test' ? t('working') : t('retest')),
+            h('button', { type: 'button', className: 'bw-link', disabled: Boolean(busy), onClick: () => run('clear', () => callHost(ctx, { action: 'clearHistory' }), t('revoked')) }, t('clear'))),
+          h('p', { className: 'bw-help' }, t('skillsHint')),
+          status.executableFound === false ? h('p', { className: 'bw-note' }, t('noExecutable')) : null,
+          note ? h('p', { className: noteOk ? 'bw-ok' : 'bw-note', role: 'status', 'aria-live': 'polite' }, note) : null) : null,
 
-      const addSiteRow = h('div', { style: S.row },
-        h('input', { value: siteHost, onChange: (e) => setSiteHost(e.target.value), placeholder: t0('hostPlaceholder'), style: S.input, 'aria-label': t0('sites') }),
-        h('select', { value: siteMode, onChange: (e) => setSiteMode(e.target.value), style: S.select, 'aria-label': t0('sites') },
-          h('option', { value: 'auto' }, t0('modeAuto')),
-          h('option', { value: 'ask' }, t0('modeAsk')),
-          h('option', { value: 'block' }, t0('modeBlock'))),
-        h('button', {
-          type: 'button', disabled: disabled || !siteHost.trim(), style: { ...S.ghost, ...(disabled || !siteHost.trim() ? S.disabled : {}) },
-          onClick: () => run('site', async () => { await callRpc(ctx, { action: 'setSite', host: siteHost, mode: siteMode }); setSiteHost(''); }, t0('saved')),
-        }, t0('addSite')));
+        status ? h('section', { className: 'bw-card' },
+          h('h2', { className: 'bw-section-title' }, t('permissions')),
+          h('div', { className: 'bw-split' },
+            h('div', null,
+              h('strong', null, t('historyLabel')),
+              h('p', { className: 'bw-help' }, t('historyHint'))),
+            h('span', { className: 'bw-chip' }, t('alwaysAsk'))),
+          h('div', { className: 'bw-split' },
+            h('div', null,
+              h('strong', null, t('defaultMode')),
+              h('p', { className: 'bw-help' }, t('defaultModeHint'))),
+            h('select', {
+              className: 'bw-select', value: status.defaultMode || 'ask',
+              'aria-label': t('defaultMode'),
+              onChange: (event) => run('default', () => callHost(ctx, { action: 'configure', defaultMode: event.target.value })),
+            },
+              h('option', { value: 'ask' }, t('modeAsk')),
+              h('option', { value: 'auto' }, t('modeAuto')),
+              h('option', { value: 'block' }, t('modeBlock'))))) : null,
 
-      const sites = status?.sites || [];
-      const sitesSection = h('section', { style: S.card },
-        h('div', { style: { fontSize: 13.5, fontWeight: 500 } }, t0('sites')),
-        h('div', { style: S.label }, t0('sitesHint')),
-        addSiteRow,
-        sites.length === 0
-          ? h('div', { style: S.empty }, t0('sitesHint'))
-          : h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, sites.map(siteRow)));
+        status ? h('section', { className: 'bw-card' },
+          h('div', { className: 'bw-card-head' },
+            h('div', null,
+              h('h2', { className: 'bw-section-title' }, t('sitePerms')),
+              h('p', { className: 'bw-muted', style: { marginTop: 4 } }, t('sitePermsHint'))),
+            h('div', { className: 'bw-row', style: { flex: 'none' } },
+              h('input', { className: 'bw-input', style: { minWidth: 140, flex: 'none' }, value: siteHost, placeholder: t('hostPlaceholder'), onChange: (event) => setSiteHost(event.target.value), onKeyDown: (event) => { if (event.key === 'Enter') addSite() }, 'aria-label': t('sitePerms') }),
+              h('button', { type: 'button', className: 'bw-secondary', disabled: Boolean(busy) || !siteHost.trim(), onClick: addSite }, `+ ${t('addSite')}`))),
+          h('div', { className: 'bw-table' },
+            h('div', { className: 'bw-thead' },
+              h('span', null, t('sitePerms')),
+              h('span', null, t('browse')),
+              h('span', null, '')),
+            h('div', { className: 'bw-trow' },
+              h('span', { className: 'bw-host' }, t('defaultRow')),
+              h('span', { className: 'bw-help' }, t('defaultModeHint')),
+              h('span', null, '')),
+            sites.map((site) => h('div', { className: 'bw-trow', key: site.host },
+              h('span', { className: 'bw-host bw-mono' }, site.host),
+              h('select', {
+                className: 'bw-select', value: site.mode, 'aria-label': `${site.host} ${t('browse')}`,
+                onChange: (event) => void saveSites(sites.map((row) => row.host === site.host ? { ...row, mode: event.target.value } : row)),
+              },
+                h('option', { value: 'ask' }, t('modeAsk')),
+                h('option', { value: 'auto' }, t('modeAuto')),
+                h('option', { value: 'block' }, t('modeBlock'))),
+              h('button', { type: 'button', className: 'bw-link', onClick: () => void saveSites(sites.filter((row) => row.host !== site.host)) }, t('remove'))))),
+          sites.length === 0 ? h('p', { className: 'bw-help' }, t('emptySites')) : null) : null,
 
-      const connectionSection = h('section', { style: S.card },
-        toggle,
-        endpointRow,
-        h('div', { style: S.label }, t0('endpointHint')),
-        connectionRow,
-        status?.executableFound === false
-          ? h('div', { style: { ...S.error, borderColor: 'var(--dsw-alias-state-warn-primary)', color: 'var(--dsw-alias-state-warn-primary)' } }, t0('executableMissing'))
-          : null);
-
-      return h(React.Fragment, null,
-        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 760 } },
-        header,
-        error ? h('div', { role: 'alert', style: S.error }, error) : null,
-        notice ? h('div', { role: 'status', style: { fontSize: 13, color: 'var(--dsw-alias-state-success-primary)' } }, notice) : null,
-        connectionSection,
-        sitesSection,
-        h('p', { style: { margin: 0, fontSize: 12.5, lineHeight: 1.6, color: 'var(--dsw-alias-label-secondary)' } }, t0('approvalNote'))),
-        h(Panel, { ctx }));
+        status ? h('section', { className: 'bw-risk' },
+          h('div', { className: 'bw-risk-head' }, h('span', { 'aria-hidden': 'true' }, '⚠'), t('risk')),
+          h('div', { className: 'bw-risk-row' },
+            h('div', null,
+              h('strong', null, t('cdpLabel')),
+              h('p', { className: 'bw-help' }, t('cdpHint'))),
+            h('button', {
+              type: 'button', className: 'bw-switch', role: 'switch',
+              'aria-checked': enabled ? 'true' : 'false',
+              'aria-label': t('cdpLabel'),
+              disabled: Boolean(busy),
+              onClick: toggle,
+            }, h('span', { className: 'bw-thumb' })))) : null
+      )
     }
 
-    function Panel({ ctx }) {
-      const [status, setStatus] = React.useState(null);
-      const [tabs, setTabs] = React.useState([]);
-      const [page, setPage] = React.useState(null);
-      const [shot, setShot] = React.useState('');
-      const [url, setUrl] = React.useState('');
-      const [history, setHistory] = React.useState([]);
-      const [busy, setBusy] = React.useState('');
-      const [error, setError] = React.useState('');
-      const t0 = (key) => t(ctx, key);
-
-      const refresh = React.useCallback(async () => {
-        try {
-          const value = await callRpc(ctx, { action: 'status' });
-          setStatus(value);
-          if (value?.enabled) {
-            const list = await callRpc(ctx, { action: 'tabs' }).catch(() => []);
-            setTabs(Array.isArray(list) ? list : []);
-          } else {
-            setTabs([]);
-          }
-          const log = await callRpc(ctx, { action: 'history', limit: 20 }).catch(() => []);
-          setHistory(Array.isArray(log) ? log : []);
-        } catch (cause) { setError(cause?.message || t0('unavailable')); }
-      }, []);
-
-      React.useEffect(() => { refresh(); }, []);
-
-      async function run(name, task) {
-        setBusy(name); setError('');
-        try { return await task(); }
-        catch (cause) { setError(cause?.message || t0('error')); return null; }
-        finally { setBusy(''); refresh(); }
-      }
-
-      const disabled = busy !== '' || !status?.enabled;
-
-      const header = h('header', { style: S.head },
-        h('div', null,
-          h('h1', { style: S.title }, t0('title')),
-          h('p', { style: S.sub }, t0('subtitle'))),
-        h(StatusPill, { ctx, status }));
-
-      const navRow = h('div', { style: S.row },
-        h('input', {
-          value: url, onChange: (e) => setUrl(e.target.value), placeholder: t0('navigatePlaceholder'), style: S.input,
-          onKeyDown: (e) => { if (e.key === 'Enter' && url.trim()) run('navigate', async () => { const info = await callRpc(ctx, { action: 'navigate', url }); setPage(info); }); },
-        }),
-        h('button', { type: 'button', disabled: disabled || !url.trim(), style: { ...S.primary, ...(disabled || !url.trim() ? S.disabled : {}) }, onClick: () => run('navigate', async () => { const info = await callRpc(ctx, { action: 'navigate', url }); setPage(info); }) }, t0('go')),
-        h('button', { type: 'button', disabled, style: { ...S.ghost, ...(disabled ? S.disabled : {}) }, onClick: () => run('read', async () => setPage(await callRpc(ctx, { action: 'read' }))) }, t0('read')),
-        h('button', { type: 'button', disabled, style: { ...S.ghost, ...(disabled ? S.disabled : {}) }, onClick: () => run('shot', async () => { const value = await callRpc(ctx, { action: 'screenshot' }); setShot(value?.dataUrl || ''); }) }, t0('screenshot')));
-
-      const tabRow = (tab) => h('div', { key: tab.id, style: { display: 'flex', gap: 8, alignItems: 'center', border: '1px solid var(--dsw-alias-border-l1)', borderRadius: 8, padding: '7px 10px' } },
-        h('div', { style: { flex: 1, minWidth: 0 } },
-          h('div', { style: { fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, tab.title || tab.url),
-          h('div', { style: { ...S.label, ...S.mono, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, tab.url)),
-        h('button', { type: 'button', style: S.ghost, onClick: () => run('activate', () => callRpc(ctx, { action: 'activate', targetId: tab.id })) }, t0('activate')),
-        h('button', { type: 'button', style: S.danger, onClick: () => run('close', () => callRpc(ctx, { action: 'closeTab', targetId: tab.id })) }, t0('close')));
-
-      const tabsSection = h('div', null,
-        h('div', { style: { ...S.label, marginBottom: 6 } }, t0('tabsTitle')),
-        tabs.length === 0
-          ? h('div', { style: S.empty }, t0('noTabs'))
-          : h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, tabs.map(tabRow)));
-
-      const pageSection = page
-        ? h('div', null,
-          h('div', { style: { ...S.label, margin: '4px 0 6px' } }, `${t0('pageTitle')} · ${page.title || ''} · ${page.url || ''}`),
-          h('div', { style: S.text }, page.text || ''))
-        : h('div', { style: S.empty }, t0('noPage'));
-
-      const shotSection = shot
-        ? h('div', null,
-          h('div', { style: { ...S.label, margin: '4px 0 6px' } }, t0('preview')),
-          h('img', { src: shot, alt: t0('preview'), style: S.img }))
-        : null;
-
-      const historySection = h('section', { style: S.card },
-        h('div', { style: { ...S.row, justifyContent: 'space-between' } },
-          h('div', { style: { fontSize: 13.5, fontWeight: 500 } }, t0('history')),
-          h('button', { type: 'button', style: S.ghost, onClick: () => run('clear', () => callRpc(ctx, { action: 'clearHistory' })) }, t0('clearHistory'))),
-        history.length === 0
-          ? h('div', { style: S.empty }, t0('noHistory'))
-          : h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4 } },
-            history.map((entry) => h('div', { key: entry.id, style: { ...S.label, ...S.mono } }, `${entry.at} · ${entry.action} · ${entry.ok ? 'ok' : 'fail'} · ${entry.detail || ''}`))));
-
-      return h('div', { style: { ...S.page, padding: '0 0 8px' } },
-        h('div', { style: S.wrap },
-          header,
-          error ? h('div', { role: 'alert', style: S.error }, `${t0('error')}${error}`) : null,
-          !status?.enabled
-            ? h('div', { style: S.card },
-              h('div', { style: { fontSize: 13.5 } }, t0('disabled')),
-              h('div', { style: S.label }, t0('enabledHint')))
-            : null,
-          h('section', { style: S.card }, navRow, tabsSection, pageSection, shotSection),
-          historySection));
+    function SummaryLine({ ctx }) {
+      return h('span', null, translate(ctx, 'sub'))
     }
 
     return {
       inject: ['slots', 'connection', 'locale'],
       apply(ctx) {
         ctx.effect(() => {
-          const section = ctx.slots.inject('settings.section', () => ctx.slots.register(
-            { name: 'settings.section', id: 'browser-use', order: 35, label: () => dictOf(ctx).title },
-            () => h(SettingsPage, { ctx })));
-          return () => { try { section?.(); } catch {} };
-        });
+          const row = ctx.slots.inject('plugins.row.config', () => ctx.slots.register({
+            name: 'plugins.row.config',
+            key: '@local/dsh-browser-computer-use#dsh-browser-computer-use',
+          }, (props) => props?.view === 'summary' ? h(SummaryLine, { ctx }) : h(ConfigPage, { ctx })))
+          const bundle = ctx.slots.inject('plugins.bundle.config', () => ctx.slots.register({
+            name: 'plugins.bundle.config',
+            key: '@local/dsh-browser-computer-use',
+          }, () => h(ConfigPage, { ctx })))
+          return () => { try { row?.() } catch {} try { bundle?.() } catch {} }
+        })
       },
-    };
+    }
   },
-});
+})
