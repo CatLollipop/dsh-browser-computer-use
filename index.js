@@ -1,6 +1,6 @@
 import { createReadOnlyWeb, createTaskStore, registerRpcRoute } from './rpc.js'
 
-export const inject = ['tools', 'web']
+export const inject = ['connection', 'tools', 'web']
 function toolDefinition(api) {
   return {
     name: 'browser_task_center',
