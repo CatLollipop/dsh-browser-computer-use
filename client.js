@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: '@local/dsh-browser-computer-use',
+  id: '@local/dsh_browser_computer_use',
   factory(require) {
     const React = require('react')
     const h = React.createElement
@@ -21,7 +21,7 @@ window.__ModuleLoader__.load({
       const call = async payload => {
         try {
           const rpc = ctx.connection?.rpc
-          const reply = rpc?.call ? await rpc.call('/api', 'dsh-browser-computer-use', payload) : null
+          const reply = rpc?.call ? await rpc.call('/api', 'dsh_browser_computer_use', payload) : null
           if (!reply) throw new Error('Host connection unavailable')
           if (reply.ok === false) throw new Error(reply.error?.message || 'RPC failed')
           return Object.hasOwn(reply, 'value') ? reply.value : reply
@@ -59,8 +59,8 @@ window.__ModuleLoader__.load({
     }
     return { inject: ['slots', 'connection', 'locale'], apply(ctx) {
       try {
-        ctx.effect(() => ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'dsh-browser-computer-use', order: 25, label: () => 'Browser tasks' }, () => h('span', { 'aria-hidden': 'true' }, '◉'))))
-        ctx.effect(() => ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'dsh-browser-computer-use' }, () => h(TaskCenter, { ctx }))))
+        ctx.effect(() => ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'dsh_browser_computer_use', order: 25, label: () => 'Browser tasks' }, () => h('span', { 'aria-hidden': 'true' }, '◉'))))
+        ctx.effect(() => ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'dsh_browser_computer_use' }, () => h(TaskCenter, { ctx }))))
       } catch {}
     } }
   }

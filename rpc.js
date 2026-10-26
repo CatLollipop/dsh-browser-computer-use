@@ -58,7 +58,7 @@ export function createReadOnlyWeb({ web } = {}) {
   }
 }
 
-export function createRpcClient({ endpoint = '/api/dsh-browser-computer-use', transport } = {}) {
+export function createRpcClient({ endpoint = '/api/dsh_browser_computer_use', transport } = {}) {
   const call = transport || (async (payload) => {
     const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
     if (!response.ok) throw new Error(`RPC ${response.status}`)
@@ -71,7 +71,7 @@ export function registerRpcRoute(ctx, handler) {
   const rpc = ctx?.connection?.rpc
   if (typeof rpc?.handle !== 'function') return () => {}
   try {
-    return rpc.handle('dsh-browser-computer-use', async (_endpoint, payload, signal, peer) => {
+    return rpc.handle('dsh_browser_computer_use', async (_endpoint, payload, signal, peer) => {
       try {
         const value = await handler(payload || {}, signal, peer)
         return { ok: true, value }
