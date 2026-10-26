@@ -3,8 +3,47 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "安全浏览器计算任务中心（仅任务编排与只读 Web fallback，不控制真实浏览器）",
-  "exports": { ".": "./index.js", "./client": "./client.js", "./rpc": "./rpc.js", "./locale/*.json": "./locale/*.json", "./icon": "./icon.svg" },
-  "files": ["package.json", "cordis.patch.yml", "index.js", "client.js", "rpc.js", "README.md", "locale/*.json", "icon.svg", "test/*.test.js"],
-  "dsh": { "bundle": { "patch": "./cordis.patch.yml" }, "client": { "platform": "web", "immediately": true, "inject": ["@deepseek-ai/dsh-client-ui-conversation"] } }
+  "description": "CDP 浏览器控制与 Computer Use 安全任务中心：手动启用、按站点授权、逐次审批后再操作真实 Chromium 浏览器",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./rpc": "./rpc.js",
+    "./cdp": "./cdp.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "package.json",
+    "cordis.patch.yml",
+    "index.js",
+    "client.js",
+    "rpc.js",
+    "cdp.js",
+    "policy.js",
+    "launcher.js",
+    "README.md",
+    "locale/*.json",
+    "icon.svg",
+    "test/*.test.js"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cdp",
+    "chrome-devtools-protocol",
+    "browser-automation"
+  ]
 }
