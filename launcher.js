@@ -53,6 +53,7 @@ export async function launchBrowser({ endpoint = 'http://127.0.0.1:9222', onLog 
   const userDataDir = profileDir()
   await mkdir(userDataDir, { recursive: true })
   const args = [
+    ...(process.env.DSH_BROWSER_HEADLESS === '1' ? ['--headless=new'] : []),
     `--remote-debugging-port=${port}`,
     '--remote-debugging-address=127.0.0.1',
     '--remote-allow-origins=*',

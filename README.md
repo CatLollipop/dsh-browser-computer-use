@@ -29,7 +29,7 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
   --no-first-run about:blank
 ```
 
-支持的浏览器：Chrome、Chrome Canary、Chromium、Microsoft Edge、Brave，以及 Playwright 缓存里的 “Google Chrome for Testing”。也可用 `DSH_BROWSER_EXECUTABLE` 指定可执行文件。
+支持的浏览器：Chrome、Chrome Canary、Chromium、Microsoft Edge、Brave，以及 Playwright 缓存里的 “Google Chrome for Testing”。也可用 `DSH_BROWSER_EXECUTABLE` 指定可执行文件；`DSH_BROWSER_HEADLESS=1` 可让启动器以 headless 模式启动（用于验证或服务器环境）。
 
 4. 点 **重新检测**，状态变为「已连接」后，左侧栏 **浏览器** 面板就可操作。
 
@@ -71,6 +71,8 @@ plugin_manager({ action: "install_bundle", target: "<本目录绝对路径>" })
 - `Page.navigate`、`Runtime.evaluate` 读取页面文本、`Page.captureScreenshot`；
 - `data:` URL 被 `URL_BLOCKED` 拒绝；`block` 站点返回 `HOST_BLOCKED`；
 - 关闭开关时工具返回 `BROWSER_DISABLED`；
+- `launchBrowser()` 实际拉起 Chrome for Testing（headless）并等到 `/json/version` 就绪；
+- 通过 DSH 活工具 `browser status` 验证：默认关闭、可发现本机 Microsoft Edge 可执行文件；
 - `node --test` 4 项通过（端点归一化、URL 守卫、动作分级、策略默认值）。
 
 未验证：真实桌面浏览器（非 headless）下的人工点击路径与深浅色视觉；本机当前为锁屏状态，未生成截图。
